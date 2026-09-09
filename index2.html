@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu & Quản Lý Chính Sách Bảo Hành</title>
+    
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Tra%20C%E1%BB%A9u%20%26%20Qu%E1%BA%A3n%20L%C3%BD%20Ch%C3%ADnh%20S%C3%A1ch%20B%E1%BA%A3o%20H%C3%A0nh%22%2C%22short_name%22%3A%22B%E1%BA%A3o%20H%C3%A0nh%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-modal {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+    <!-- Top Header -->
+    <header class="sticky top-0 z-30 glass-panel border-b border-slate-800/80 bg-slate-900/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-gradient-to-tr from-blue-600 to-indigo-500 text-white rounded-2xl shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-base md:text-lg text-white tracking-tight flex items-center gap-2">
+                            Tra Cứu & Quản Lý Chính Sách
+                            <span class="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full font-semibold">v3.5</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Tùy chỉnh linh hoạt danh mục & trường thông tin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions & Search -->
+            <div class="flex items-center gap-2.5 flex-wrap md:flex-nowrap">
+                <div class="relative flex-1 md:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Tìm sản phẩm, chính sách..." 
+                        class="w-full pl-9 pr-3 py-2 bg-slate-800/90 text-slate-100 placeholder-slate-400 text-xs font-medium rounded-xl border border-slate-700/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition">
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <button onclick="openCategoryModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm hover:border-slate-600">
+                        <i class="fa-solid fa-folder-plus text-amber-400"></i>
+                        <span>Quản lý danh mục</span>
+                    </button>
+
+                    <button onclick="openBackupModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm hover:border-slate-600">
+                        <i class="fa-solid fa-file-export text-purple-400"></i>
+                        <span>Sao lưu / JSON</span>
+                    </button>
+
+                    <button onclick="openCalcModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm hover:border-slate-600">
+                        <i class="fa-solid fa-calculator text-blue-400"></i>
+                        <span>Đổi trả</span>
+                    </button>
+
+                    <button onclick="openInstallmentModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm hover:border-slate-600">
+                        <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i>
+                        <span>Trả chậm</span>
+                    </button>
+
+                    <button onclick="openBhytModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm hover:border-slate-600">
+                        <i class="fa-solid fa-heart-pulse text-rose-400"></i>
+                        <span>BHYT</span>
+                    </button>
+
+                    <button onclick="openEditModal(null)" class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md shadow-blue-600/30">
+                        <i class="fa-solid fa-plus"></i>
+                        <span class="hidden sm:inline">Thêm mới</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Category Tabs Navigation -->
+    <nav class="bg-slate-900/60 border-b border-slate-800 px-4 sm:px-6 lg:px-8 py-2">
+        <div class="max-w-7xl mx-auto flex items-center gap-2 overflow-x-auto custom-scrollbar py-1" id="categoryContainer">
+            <!-- Dynamic Category Tabs -->
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Sidebar Item List -->
+        <div class="lg:col-span-4 flex flex-col gap-3">
+            <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                <span class="font-bold uppercase tracking-wider text-[11px]" id="itemListHeader">Sản phẩm / Dịch vụ</span>
+                <span id="itemCountBadge" class="bg-slate-800 text-slate-300 font-semibold px-2 py-0.5 rounded-full border border-slate-700">0 mục</span>
+            </div>
+
+            <div id="itemList" class="space-y-2.5 max-h-[calc(100vh-210px)] overflow-y-auto custom-scrollbar pr-1">
+                <!-- Item Cards injected here -->
+            </div>
+        </div>
+
+        <!-- Policy Details Display Area -->
+        <div class="lg:col-span-8 flex flex-col gap-4">
+            <div id="policyDetailContainer" class="glass-panel rounded-3xl p-6 border border-slate-800 shadow-xl min-h-[480px]">
+                <!-- Active Policy Content rendered here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Tính Phí Đổi Trả -->
+    <div id="calcModal" class="fixed inset-0 glass-modal z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-800 animate-fade-in text-slate-100">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-blue-500/10 text-blue-400 rounded-xl">
+                        <i class="fa-solid fa-calculator text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base">Tính Phí Đổi Trả Máy</h3>
+                        <p class="text-xs text-slate-400">Tháng đầu 20%, mỗi tháng sau +10%</p>
+                    </div>
+                </div>
+                <button onclick="closeCalcModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="py-4 space-y-4 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Giá bán sản phẩm (VNĐ)</label>
+                    <input type="number" id="calcPrice" oninput="calculateFee()" placeholder="Nhập giá bán..."
+                        class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-sm font-semibold focus:border-blue-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Thời gian đã dùng</label>
+                        <select id="calcMonth" onchange="calculateFee()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 font-semibold focus:border-blue-500 outline-none">
+                            <option value="1">Tháng 1 (Mới mua)</option>
+                            <option value="2">Tháng 2 (+10%)</option>
+                            <option value="3">Tháng 3 (+20%)</option>
+                            <option value="4">Tháng 4 (+30%)</option>
+                            <option value="5">Tháng 5 (+40%)</option>
+                            <option value="6">Tháng 6 (+50%)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Tình trạng vỏ hộp</label>
+                        <select id="calcBox" onchange="calculateFee()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 font-semibold focus:border-blue-500 outline-none">
+                            <option value="full">Đầy đủ vỏ hộp (0đ)</option>
+                            <option value="lost">Mất vỏ hộp (Tính phí)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="calcResult" class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 space-y-2">
+                    <!-- Dynamic result -->
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeCalcModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition border border-slate-700">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tính Trả Chậm -->
+    <div id="installmentModal" class="fixed inset-0 glass-modal z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-800 animate-fade-in text-slate-100">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                        <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base">Tính Dự Toán Trả Chậm</h3>
+                        <p class="text-xs text-slate-400">Trước 14 ngày hủy hợp đồng miễn phí</p>
+                    </div>
+                </div>
+                <button onclick="closeInstallmentModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="py-4 space-y-3.5 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Giá sản phẩm (VNĐ)</label>
+                        <input type="number" id="instPrice" oninput="calculateInstallment()" placeholder="Giá máy..."
+                            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold focus:border-emerald-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Trả trước (VNĐ)</label>
+                        <input type="number" id="instDownPay" oninput="calculateInstallment()" placeholder="Trả trước..."
+                            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold focus:border-emerald-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2.5">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Kỳ hạn (tháng)</label>
+                        <input type="number" id="instTenure" min="1" max="60" value="6" oninput="calculateInstallment()"
+                            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold focus:border-emerald-500 outline-none text-center">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Lãi suất (%/th)</label>
+                        <input type="number" id="instRate" step="0.1" value="1.5" oninput="calculateInstallment()"
+                            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold focus:border-emerald-500 outline-none text-center">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Phí thu hộ (tháng)</label>
+                        <input type="number" id="instFee" value="12000" oninput="calculateInstallment()"
+                            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold focus:border-emerald-500 outline-none text-center">
+                    </div>
+                </div>
+
+                <div id="instResultBox" class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800/60 space-y-2">
+                    <!-- Dynamic installment output -->
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeInstallmentModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition border border-slate-700">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tính Phí Bảo Hiểm Y Tế Hộ Gia Đình -->
+    <div id="bhytModal" class="fixed inset-0 glass-modal z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-800 animate-fade-in text-slate-100">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-rose-500/10 text-rose-400 rounded-xl">
+                        <i class="fa-solid fa-heart-pulse text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base">Tính Mức Đóng Bảo Hiểm Y Tế</h3>
+                        <p class="text-xs text-slate-400">Áp dụng giảm trừ theo hộ gia đình cùng nơi thường trú</p>
+                    </div>
+                </div>
+                <button onclick="closeBhytModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="py-4 space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Số người tham gia</label>
+                        <select id="bhytMemberCount" onchange="calculateBhytFee()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 font-semibold focus:border-rose-500 outline-none">
+                            <option value="1">1 người (100%)</option>
+                            <option value="2">2 người (100% + 70%)</option>
+                            <option value="3">3 người (100% + 70% + 60%)</option>
+                            <option value="4">4 người (100% + 70% + 60% + 50%)</option>
+                            <option value="5">5 người (người 5+: 40%)</option>
+                            <option value="6">6 người</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Thời hạn đóng</label>
+                        <select id="bhytDuration" onchange="calculateBhytFee()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 font-semibold focus:border-rose-500 outline-none">
+                            <option value="12" selected>12 tháng (1 năm)</option>
+                            <option value="6">6 tháng</option>
+                            <option value="3">3 tháng</option>
+                            <option value="1">1 tháng</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="bhytResultBox" class="p-4 rounded-2xl bg-rose-950/40 border border-rose-800/60 space-y-3">
+                    <!-- BHYT results -->
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeBhytModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition border border-slate-700">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Policy Item (Dynamic Fields Builder) -->
+    <div id="editModal" class="fixed inset-0 glass-modal z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-800 animate-fade-in text-slate-100 max-h-[92vh] flex flex-col justify-between">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-blue-500/10 text-blue-400 rounded-xl">
+                        <i class="fa-solid fa-pen-to-square text-base"></i>
+                    </div>
+                    <h3 id="modalTitle" class="font-bold text-slate-100 text-base">Tùy Chỉnh Nội Dung Chính Sách</h3>
+                </div>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="policyForm" onsubmit="savePolicy(event)" class="py-4 space-y-4 text-xs overflow-y-auto custom-scrollbar pr-1 flex-1">
+                <input type="hidden" id="editItemId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Danh mục sản phẩm</label>
+                        <select id="editCategory" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold outline-none focus:border-blue-500">
+                            <!-- Dynamic category options -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Nhãn / Badge nổi bật</label>
+                        <input type="text" id="editBadge" placeholder="VD: BH 1 năm / 1 đổi 1 30 ngày"
+                            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Tên sản phẩm / Dịch vụ</label>
+                    <input type="text" id="editTitle" required placeholder="VD: Điện thoại iPhone, Tai nghe Bluetooth..."
+                        class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold outline-none focus:border-blue-500">
+                </div>
+
+                <!-- Dynamic Sections Header -->
+                <div class="pt-2 border-t border-slate-800">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h4 class="font-bold text-slate-200 text-xs uppercase tracking-wider">Các Trường Nội Dung Tùy Chỉnh</h4>
+                            <p class="text-[11px] text-slate-400">Tự do tạo Label, Nội dung & chọn kiểu hiển thị theo ý muốn</p>
+                        </div>
+                        <button type="button" onclick="addDynamicSectionField()" class="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs font-semibold rounded-xl transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus text-xs"></i>
+                            <span>+ Thêm trường nội dung</span>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Section Items Container -->
+                    <div id="dynamicSectionsContainer" class="space-y-3">
+                        <!-- Dynamic Section Blocks injected here -->
+                    </div>
+                </div>
+            </form>
+
+            <div class="pt-3 flex justify-between items-center border-t border-slate-800">
+                <button type="button" onclick="deleteCurrentPolicyItem()" id="btnDeletePolicyItem" class="px-3.5 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 font-semibold rounded-xl text-xs transition flex items-center gap-1.5 hidden">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Xóa sản phẩm này</span>
+                </button>
+                <div class="flex items-center gap-2 ml-auto">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700">
+                        Hủy
+                    </button>
+                    <button type="button" onclick="document.getElementById('policyForm').requestSubmit()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs transition shadow-md shadow-blue-600/30">
+                        Lưu chính sách
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Quản Lý Danh Mục (Tạo Mới, Sửa Tên, Xóa Danh Mục) -->
+    <div id="categoryModal" class="fixed inset-0 glass-modal z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-800 animate-fade-in text-slate-100 max-h-[88vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-2 bg-amber-500/10 text-amber-400 rounded-xl">
+                        <i class="fa-solid fa-folder-plus text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base">Quản Lý Danh Mục</h3>
+                        <p class="text-xs text-slate-400">Tạo mới, đổi tên hoặc xóa nhóm sản phẩm</p>
+                    </div>
+                </div>
+                <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Form Thêm Danh Mục Mới -->
+            <form onsubmit="addNewCategory(event)" class="py-4 border-b border-slate-800 space-y-3 text-xs">
+                <input type="hidden" id="editCatIndex" value="-1">
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1" id="catFormTitle">Thêm danh mục mới</label>
+                    <input type="text" id="newCatName" required placeholder="VD: Laptop, Gia dụng, Thiết bị Y tế..."
+                        class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold outline-none focus:border-amber-500">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-300 mb-1">Chọn Biểu Tượng (Icon)</label>
+                    <select id="newCatIcon" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-semibold outline-none focus:border-amber-500">
+                        <option value="fa-mobile-screen-button">Điện thoại (fa-mobile-screen-button)</option>
+                        <option value="fa-headphones">Tai nghe / Phụ kiện (fa-headphones)</option>
+                        <option value="fa-laptop">Laptop / Máy tính (fa-laptop)</option>
+                        <option value="fa-tv">Tivi / Màn hình (fa-tv)</option>
+                        <option value="fa-clock">Đồng hồ (fa-clock)</option>
+                        <option value="fa-film">Miếng dán / Phim dán (fa-film)</option>
+                        <option value="fa-heart-pulse">Bảo hiểm Y tế (fa-heart-pulse)</option>
+                        <option value="fa-plug">Điện gia dụng (fa-plug)</option>
+                        <option value="fa-box">Sản phẩm chung (fa-box)</option>
+                        <option value="fa-shield-halved">Bảo hành (fa-shield-halved)</option>
+                        <option value="fa-tags">Khuyến mãi (fa-tags)</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" id="btnSaveCategory" class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-xl shadow-md transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i>
+                        <span id="btnSaveCategoryText">Tạo danh mục mới</span>
+                    </button>
+                    <button type="button" id="btnCancelCategoryEdit" onclick="cancelEditCategory()" class="hidden px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl transition border border-slate-700">
+                        Hủy
+                    </button>
+                </div>
+            </form>
+
+            <div class="py-3">
+                <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Danh mục hiện có</h4>
+                <div id="categoryManageList" class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+                    <!-- Dynamic category manage list -->
+                </div>
+            </div>
+
+            <div class="pt-3 flex justify-end border-t border-slate-800">
+                <button onclick="closeCategoryModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Sao Lưu / Nhập Xuất JSON -->
+    <div id="backupModal" class="fixed inset-0 glass-modal z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-800 animate-fade-in text-slate-100">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-2 bg-purple-500/10 text-purple-400 rounded-xl">
+                        <i class="fa-solid fa-database text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-100 text-base">Sao Lưu & Khôi Phục Dữ Liệu</h3>
+                        <p class="text-xs text-slate-400">Xuất/nhập dữ liệu dưới dạng tệp JSON</p>
+                    </div>
+                </div>
+                <button onclick="closeBackupModal()" class="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="py-5 space-y-4 text-xs">
+                <!-- Export -->
+                <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-200">Xuất dữ liệu (.json)</h4>
+                        <p class="text-[11px] text-slate-400">Tải tệp JSON chứa tất cả chính sách & danh mục</p>
+                    </div>
+                    <button onclick="exportJsonData()" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Xuất tệp</span>
+                    </button>
+                </div>
+
+                <!-- Import -->
+                <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/80 flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-200">Nhập dữ liệu (.json)</h4>
+                        <p class="text-[11px] text-slate-400">Khôi phục danh mục & chính sách từ file sao lưu</p>
+                    </div>
+                    <label class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-upload"></i>
+                        <span>Chọn file</span>
+                        <input type="file" id="importFileInput" accept=".json" onchange="importJsonData(event)" class="hidden">
+                    </label>
+                </div>
+
+                <!-- Reset -->
+                <div class="p-3.5 rounded-2xl bg-rose-950/20 border border-rose-900/40 flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-rose-300">Khôi phục mặc định</h4>
+                        <p class="text-[11px] text-slate-400">Xóa dữ liệu tùy chỉnh & quay lại quy chuẩn chuẩn</p>
+                    </div>
+                    <button onclick="resetDefaultData()" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Đặt lại</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeBackupModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition border border-slate-700">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out pointer-events-none">
+        <div class="bg-slate-800 text-slate-100 px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3">
+            <div id="toastIcon" class="p-1.5 bg-blue-500/20 text-blue-400 rounded-lg">
+                <i class="fa-solid fa-circle-check text-sm"></i>
+            </div>
+            <span id="toastMsg" class="text-xs font-semibold">Thông báo</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
+        <p>© Tra Cứu & Quản Lý Chính Sách Tùy Biến - Chuẩn Tự Do Nội Bộ</p>
+    </footer>
+
+    <!-- Application Logic Script -->
+    <script>
+        // AUTHENTIC DEFAULT POLICY DATA WITH FLEXIBLE SECTIONS
+        const exactData = [
+            {
+                category: "Điện thoại",
+                icon: "fa-mobile-screen-button",
+                items: [
+                    {
+                        id: "dt-thong-thuong",
+                        title: "Điện thoại thông thường",
+                        badge: "BH 1 năm / 1 đổi 1 30 ngày",
+                        badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+                        sections: [
+                            {
+                                label: "Chính sách bảo hành",
+                                content: "• Bảo hành 1 năm.\n• 1 đổi 1 trong 30 ngày đầu.\n  - Điều kiện: Có lỗi phần cứng từ NSX. Không làm rơi rớt, cấn móp, trầy xước và phải mở nguồn lên được.\n• Lỗi phần mềm chỉ hỗ trợ fix.\n• Tháng thứ 2 - 12: Gửi hãng bảo hành thời gian từ 7 - 15 ngày.",
+                                displayType: "info"
+                            },
+                            {
+                                label: "Quy định đổi trả / Sửa chữa",
+                                content: "• Trong tháng đầu: Mất phí 20%.\n• Các tháng sau: Cộng dồn 10% mỗi tháng.\n• Đổi mất hộp: Sẽ mất thêm phí vỏ hộp.",
+                                displayType: "success"
+                            },
+                            {
+                                label: "Quy định trả chậm / Hồ sơ",
+                                content: "• Trả chậm: Trước 14 ngày được hủy hợp đồng.\n• Sau 14 ngày: Phải tất toán hợp đồng và đổi trả sẽ mất phí như đổi trả thông thường.",
+                                displayType: "warning"
+                            }
+                        ]
+                    },
+                    {
+                        id: "dt-apple",
+                        title: "Điện thoại Apple",
+                        badge: "BH 1 năm / Thẩm định lỗi",
+                        badgeColor: "bg-slate-500/10 text-slate-300 border-slate-500/20",
+                        sections: [
+                            {
+                                label: "Chính sách bảo hành",
+                                content: "• Bảo hành 1 năm.\n• 1 đổi 1 trong 30 ngày đầu.\n  - Điều kiện: Có lỗi phần cứng từ NSX. Không làm rơi rớt, cấn móp, trầy xước và phải mở nguồn lên được.\n  - GỬI HÃNG THẨM ĐỊNH LỖI (Thời gian 7 - 15 ngày).\n• Tháng thứ 2 - 12: Gửi hãng bảo hành thời gian từ 7 - 15 ngày.\n• Lưu ý: Khi đã khui seal thì KHÔNG THỂ ĐỔI MÀU.",
+                                displayType: "info"
+                            },
+                            {
+                                label: "Quy định đổi trả",
+                                content: "• Trong tháng đầu: Mất phí 20%.\n• Các tháng sau: Cộng dồn 10% mỗi tháng.\n• Đổi mất hộp: Sẽ mất thêm phí vỏ hộp.",
+                                displayType: "success"
+                            },
+                            {
+                                label: "Trả chậm",
+                                content: "• Trả chậm: Trước 14 ngày được hủy hợp đồng.\n• Sau 14 ngày: Phải tất toán hợp đồng và đổi trả sẽ mất phí như đổi trả thông thường.",
+                                displayType: "warning"
+                            }
+                        ]
+                    },
+                    {
+                        id: "dt-da-su-dung",
+                        title: "Điện thoại đã sử dụng",
+                        badge: "BH 30 ngày",
+                        badgeColor: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                        sections: [
+                            {
+                                label: "Bảo hành máy cũ",
+                                content: "• Bảo hành 30 ngày nếu có lỗi phần cứng từ NSX.",
+                                displayType: "info"
+                            },
+                            {
+                                label: "Phí đổi trả",
+                                content: "• Trả máy mất phí 10% trong 30 ngày.",
+                                displayType: "warning"
+                            },
+                            {
+                                label: "Sau 30 ngày",
+                                content: "• Bảo hành hãng nếu còn thời gian bảo hành.\n• Không được đổi máy.",
+                                displayType: "alert"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                category: "Phụ kiện",
+                icon: "fa-headphones",
+                items: [
+                    {
+                        id: "pk-thong-thuong",
+                        title: "Phụ kiện thông thường",
+                        badge: "1 đổi 1 trong 1 năm",
+                        badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+                        sections: [
+                            {
+                                label: "Chính sách bảo hành",
+                                content: "• Bảo hành 1 năm.\n• 1 đổi 1 trong 1 năm.\n• Điều kiện: Không làm rơi rớt, vào nước, đứt dây.",
+                                displayType: "info"
+                            },
+                            {
+                                label: "Đổi sản phẩm khác",
+                                content: "• Trong 48h: Đổi sang phụ kiện bất kỳ (Thiếu thì bù, dư thì trả lại KH).",
+                                displayType: "success"
+                            },
+                            {
+                                label: "Phí trả hàng",
+                                content: "• Tháng đầu trả: Mất phí 20%.\n• Các tháng sau: Cộng dồn 10% mỗi tháng.",
+                                displayType: "warning"
+                            }
+                        ]
+                    },
+                    {
+                        id: "pk-apple",
+                        title: "Phụ kiện Apple",
+                        badge: "BH 1 năm / Tháng đầu 1 đổi 1",
+                        badgeColor: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+                        sections: [
+                            {
+                                label: "Bảo hành Apple",
+                                content: "• Bảo hành 1 năm.\n• 1 đổi 1 trong 30 ngày đầu tại cửa hàng.\n• Tháng thứ 2 về sau: Gửi hãng bảo hành.",
+                                displayType: "info"
+                            },
+                            {
+                                label: "Quy định IMEI",
+                                content: "• Sản phẩm có IMEI: Cho đổi trả.\n• Sản phẩm không IMEI: Chỉ bảo hành.",
+                                displayType: "warning"
+                            },
+                            {
+                                label: "Phí trả hàng Apple",
+                                content: "• Tháng đầu: Mất phí 50%.\n• Tháng thứ 2 về sau: KHÔNG ĐỔI TRẢ, chỉ áp dụng bảo hành hãng.",
+                                displayType: "alert"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                category: "Miếng dán",
+                icon: "fa-film",
+                items: [
+                    {
+                        id: "dankinh-cuong-luc",
+                        title: "Miếng dán cường lực",
+                        badge: "BH 30 ngày / Giảm 30% dán lại",
+                        badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+                        sections: [
+                            {
+                                label: "Quyền lợi bảo hành",
+                                content: "• Bảo hành 30 ngày.\n• Trong 30 ngày nếu bị bong bóng, cảm ứng không ăn do kính, hở viền: ĐƯỢC DÁN LẠI MIỄN PHÍ 1 LẦN.\n• Sau 30 ngày: Dán lại sẽ được giảm 30% giá trị miếng dán.",
+                                displayType: "info"
+                            },
+                            {
+                                label: "Yêu cầu kiểm tra",
+                                content: "• Điều kiện bảo hành: Khách còn giữ SĐT bảo hành.\n• Dán xong cho khách kiểm tra lại, nếu KHÔNG HÀI LÒNG THÌ DÁN LẠI.",
+                                displayType: "success"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                category: "Bảo hiểm Y tế",
+                icon: "fa-heart-pulse",
+                items: [
+                    {
+                        id: "bhyt-chi-tiet",
+                        title: "Bảo hiểm Y tế Hộ gia đình",
+                        badge: "Tư vấn & Bảng giá chuẩn",
+                        badgeColor: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+                        sections: [
+                            {
+                                label: "Quy định gia hạn & Hiệu lực",
+                                content: "• Có thể gia hạn trước 3 tháng.\n• Hết hạn quá 3 tháng thì sẽ phải đăng ký mới.\n• Mua mới hoặc gián đoạn 3 tháng: Thẻ BHYT sẽ có giá trị sau 30 ngày kể từ ngày mua.\n• Phải cùng địa chỉ thường trú mới được giảm giá theo hộ gia đình.",
+                                displayType: "info"
+                            },
+                            {
+                                label: "Bảng giá mức đóng BHYT",
+                                content: "Sử dụng công cụ 'BHYT' trên thanh menu để tra cứu bảng giá chi tiết từng người trong gia đình.",
+                                displayType: "table"
+                            },
+                            {
+                                label: "Giấy tờ hồ sơ cần mang theo",
+                                content: "• CCCD, VNeID.\n• Nếu khách hàng có thường trú khác nơi mua thì phải có tờ đăng ký tạm trú tại nơi mua.",
+                                displayType: "warning"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let categoriesData = [];
+        let activeCategory = "Tất cả";
+        let activeItemId = null;
+        let searchQuery = "";
+
+        // Standardize item sections for backward compatibility
+        function getItemSections(item) {
+            if (item.sections && Array.isArray(item.sections) && item.sections.length > 0) {
+                return item.sections;
+            }
+            // Fallback for legacy data
+            const sections = [];
+            if (item.warranty) sections.push({ label: "Chính sách bảo hành", content: item.warranty, displayType: "info" });
+            if (item.repair) sections.push({ label: "Quy định đổi trả / Sửa chữa", content: item.repair, displayType: "success" });
+            if (item.returns) sections.push({ label: "Quy định trả chậm / Lưu ý", content: item.returns, displayType: "warning" });
+            return sections;
+        }
+
+        function loadDataFromStorage() {
+            const saved = localStorage.getItem('app_policy_data_v3_5');
+            if (saved) {
+                try {
+                    categoriesData = JSON.parse(saved);
+                } catch (e) {
+                    categoriesData = exactData;
+                }
+            } else {
+                categoriesData = exactData;
+            }
+            updateCategorySelectOptions();
+        }
+
+        function saveDataToStorage() {
+            localStorage.setItem('app_policy_data_v3_5', JSON.stringify(categoriesData));
+            updateCategorySelectOptions();
+        }
+
+        function updateCategorySelectOptions() {
+            const editCatSelect = document.getElementById('editCategory');
+            if (!editCatSelect) return;
+            editCatSelect.innerHTML = categoriesData.map(c => `
+                <option value="${c.category}">${c.category}</option>
+            `).join('');
+        }
+
+        // ================= CATEGORY MANAGEMENT (CREATE, EDIT, DELETE) =================
+        function openCategoryModal() {
+            cancelEditCategory();
+            renderManageCategoryList();
+            document.getElementById('categoryModal').classList.remove('hidden');
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+        }
+
+        function renderManageCategoryList() {
+            const container = document.getElementById('categoryManageList');
+            if (!container) return;
+
+            container.innerHTML = categoriesData.map((c, index) => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-xs">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid ${c.icon || 'fa-folder'} text-amber-400 text-sm"></i>
+                        <span class="font-bold text-slate-200">${c.category}</span>
+                        <span class="text-[10px] text-slate-400 bg-slate-700/60 px-2 py-0.5 rounded-full">
+                            ${c.items ? c.items.length : 0} sản phẩm
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="startEditCategory(${index})" title="Đổi tên / Icon" class="text-blue-400 hover:text-blue-300 p-1 hover:bg-blue-500/10 rounded-md transition">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteCategory(${index})" title="Xóa danh mục" class="text-rose-400 hover:text-rose-300 p-1 hover:bg-rose-500/10 rounded-md transition">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startEditCategory(index) {
+            const cat = categoriesData[index];
+            if (!cat) return;
+
+            document.getElementById('editCatIndex').value = index;
+            document.getElementById('newCatName').value = cat.category;
+            document.getElementById('newCatIcon').value = cat.icon || 'fa-folder';
+            document.getElementById('catFormTitle').textContent = "Chỉnh sửa danh mục";
+            document.getElementById('btnSaveCategoryText').textContent = "Cập nhật danh mục";
+            document.getElementById('btnCancelCategoryEdit').classList.remove('hidden');
+        }
+
+        function cancelEditCategory() {
+            document.getElementById('editCatIndex').value = "-1";
+            document.getElementById('newCatName').value = "";
+            document.getElementById('catFormTitle').textContent = "Thêm danh mục mới";
+            document.getElementById('btnSaveCategoryText').textContent = "Tạo danh mục mới";
+            document.getElementById('btnCancelCategoryEdit').classList.add('hidden');
+        }
+
+        function addNewCategory(e) {
+            e.preventDefault();
+            const editIndex = parseInt(document.getElementById('editCatIndex').value);
+            const name = document.getElementById('newCatName').value.trim();
+            const icon = document.getElementById('newCatIcon').value;
+
+            if (!name) return;
+
+            if (editIndex >= 0) {
+                // Updating existing category
+                const oldName = categoriesData[editIndex].category;
+                categoriesData[editIndex].category = name;
+                categoriesData[editIndex].icon = icon;
+
+                if (activeCategory === oldName) {
+                    activeCategory = name;
+                }
+                showToast(`Đã cập nhật danh mục thành "${name}"!`);
+            } else {
+                // Creating new category
+                if (categoriesData.some(c => c.category.toLowerCase() === name.toLowerCase())) {
+                    showToast('Danh mục này đã tồn tại!');
+                    return;
+                }
+
+                categoriesData.push({
+                    category: name,
+                    icon: icon,
+                    items: []
+                });
+                showToast(`Đã tạo danh mục mới "${name}"!`);
+            }
+
+            saveDataToStorage();
+            cancelEditCategory();
+            renderManageCategoryList();
+            renderCategoryTabs();
+            renderItemList();
+        }
+
+        function deleteCategory(index) {
+            const cat = categoriesData[index];
+            if (!cat) return;
+
+            const itemNum = cat.items ? cat.items.length : 0;
+            const confirmMsg = itemNum > 0 
+                ? `Danh mục "${cat.category}" đang chứa ${itemNum} sản phẩm. Xóa danh mục sẽ xóa toàn bộ sản phẩm bên trong. Bạn có chắc chắn?`
+                : `Bạn có chắc muốn xóa danh mục "${cat.category}"?`;
+
+            if (confirm(confirmMsg)) {
+                categoriesData.splice(index, 1);
+                if (activeCategory === cat.category) {
+                    activeCategory = "Tất cả";
+                }
+                saveDataToStorage();
+                renderManageCategoryList();
+                renderCategoryTabs();
+                renderItemList();
+                showToast(`Đã xóa danh mục "${cat.category}"`);
+            }
+        }
+
+        // ================= BACKUP & EXPORT =================
+        function openBackupModal() {
+            document.getElementById('backupModal').classList.remove('hidden');
+        }
+
+        function closeBackupModal() {
+            document.getElementById('backupModal').classList.add('hidden');
+        }
+
+        function exportJsonData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(categoriesData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `chinh_sach_bao_hanh_backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Đã tải xuống tệp JSON sao lưu!');
+        }
+
+        function importJsonData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed)) {
+                        categoriesData = parsed;
+                        saveDataToStorage();
+                        renderCategoryTabs();
+                        renderItemList();
+                        closeBackupModal();
+                        showToast('Nhập dữ liệu JSON thành công!');
+                    } else {
+                        showToast('Cấu trúc file JSON không hợp lệ!');
+                    }
+                } catch (err) {
+                    showToast('Đã xảy ra lỗi khi đọc file JSON!');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function resetDefaultData() {
+            if (confirm('Bạn có chắc muốn đặt lại dữ liệu chuẩn ban đầu? Mọi tùy chỉnh sẽ bị ghi đè.')) {
+                categoriesData = JSON.parse(JSON.stringify(exactData));
+                saveDataToStorage();
+                activeCategory = "Tất cả";
+                renderCategoryTabs();
+                renderItemList();
+                closeBackupModal();
+                showToast('Đã khôi phục dữ liệu mặc định!');
+            }
+        }
+
+        // ================= RENDERING MAIN UI =================
+        function renderCategoryTabs() {
+            const container = document.getElementById('categoryContainer');
+            const allCategories = ["Tất cả", ...categoriesData.map(c => c.category)];
+
+            container.innerHTML = allCategories.map(cat => {
+                const isActive = activeCategory === cat;
+                const iconClass = cat === "Tất cả" ? "fa-list" : (categoriesData.find(c => c.category === cat)?.icon || "fa-folder");
+
+                return `
+                    <button onclick="selectCategory('${cat}')" 
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition flex items-center gap-2 border ${
+                            isActive 
+                            ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-600/30' 
+                            : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700/80 hover:text-white'
+                        }">
+                        <i class="fa-solid ${iconClass} ${isActive ? 'text-white' : 'text-slate-400'}"></i>
+                        <span>${cat}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectCategory(cat) {
+            activeCategory = cat;
+            renderCategoryTabs();
+            renderItemList();
+        }
+
+        function renderItemList() {
+            const itemListEl = document.getElementById('itemList');
+            const itemCountBadge = document.getElementById('itemCountBadge');
+            let items = [];
+
+            categoriesData.forEach(catObj => {
+                if (activeCategory === "Tất cả" || activeCategory === catObj.category) {
+                    catObj.items.forEach(item => {
+                        items.push({ ...item, categoryName: catObj.category });
+                    });
+                }
+            });
+
+            if (searchQuery.trim() !== "") {
+                const q = searchQuery.toLowerCase();
+                items = items.filter(i => {
+                    const sections = getItemSections(i);
+                    const matchTitle = i.title.toLowerCase().includes(q);
+                    const matchSection = sections.some(s => s.label.toLowerCase().includes(q) || s.content.toLowerCase().includes(q));
+                    return matchTitle || matchSection;
+                });
+            }
+
+            itemCountBadge.textContent = `${items.length} mục`;
+
+            if (items.length === 0) {
+                itemListEl.innerHTML = `
+                    <div class="p-6 text-center text-slate-500 bg-slate-800/30 rounded-2xl border border-slate-800">
+                        <i class="fa-solid fa-box-open text-2xl mb-2 text-slate-600"></i>
+                        <p class="text-xs font-medium">Không tìm thấy chính sách nào</p>
+                    </div>
+                `;
+                document.getElementById('policyDetailContainer').innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-slate-500 py-12">
+                        <i class="fa-solid fa-file-circle-exclamation text-4xl mb-3 text-slate-600"></i>
+                        <p class="text-sm font-semibold">Chọn hoặc tạo một chính sách để xem chi tiết</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (!activeItemId || !items.some(i => i.id === activeItemId)) {
+                activeItemId = items[0].id;
+            }
+
+            itemListEl.innerHTML = items.map(item => {
+                const isActive = item.id === activeItemId;
+                const sections = getItemSections(item);
+                const summaryText = sections.length > 0 ? sections[0].content.replace(/•/g, '').trim() : 'Nhấp xem chi tiết...';
+
+                return `
+                    <div onclick="selectItem('${item.id}')" 
+                        class="p-3.5 rounded-2xl border transition cursor-pointer flex flex-col gap-1.5 ${
+                            isActive 
+                            ? 'bg-slate-800/90 border-blue-500/80 shadow-lg shadow-blue-500/10' 
+                            : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800/70 hover:border-slate-700'
+                        }">
+                        <div class="flex items-center justify-between gap-2">
+                            <h4 class="font-bold text-slate-100 text-xs line-clamp-1">${item.title}</h4>
+                            <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold border ${item.badgeColor || 'bg-slate-700 text-slate-300 border-slate-600'}">
+                                ${item.badge || 'Chính sách'}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                            ${summaryText}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+
+            renderPolicyDetails();
+        }
+
+        function selectItem(id) {
+            activeItemId = id;
+            renderItemList();
+        }
+
+        // Return styling classes and icon for dynamic section display types
+        function getStyleByDisplayType(type) {
+            switch(type) {
+                case 'success':
+                    return {
+                        boxClass: 'bg-emerald-950/20 border-emerald-800/50',
+                        titleClass: 'text-emerald-400',
+                        icon: 'fa-square-check'
+                    };
+                case 'warning':
+                    return {
+                        boxClass: 'bg-amber-950/20 border-amber-800/50',
+                        titleClass: 'text-amber-400',
+                        icon: 'fa-triangle-exclamation'
+                    };
+                case 'alert':
+                    return {
+                        boxClass: 'bg-rose-950/20 border-rose-800/50',
+                        titleClass: 'text-rose-400',
+                        icon: 'fa-circle-exclamation'
+                    };
+                case 'table':
+                    return {
+                        boxClass: 'bg-purple-950/20 border-purple-800/50',
+                        titleClass: 'text-purple-400',
+                        icon: 'fa-table-list'
+                    };
+                case 'badge':
+                    return {
+                        boxClass: 'bg-indigo-950/20 border-indigo-800/50',
+                        titleClass: 'text-indigo-400',
+                        icon: 'fa-bookmark'
+                    };
+                case 'info':
+                default:
+                    return {
+                        boxClass: 'bg-blue-950/20 border-blue-800/50',
+                        titleClass: 'text-blue-400',
+                        icon: 'fa-shield-halved'
+                    };
+            }
+        }
+
+        function renderPolicyDetails() {
+            const container = document.getElementById('policyDetailContainer');
+            let item = null;
+            let catObj = null;
+
+            for (let c of categoriesData) {
+                const found = c.items.find(i => i.id === activeItemId);
+                if (found) {
+                    item = found;
+                    catObj = c;
+                    break;
+                }
+            }
+
+            if (!item) return;
+
+            const sections = getItemSections(item);
+            const isBhyt = catObj.category === "Bảo hiểm Y tế";
+
+            // Structured Table HTML for BHYT
+            const bhytTableHTML = `
+                <div class="overflow-x-auto rounded-xl border border-slate-700/80 my-2">
+                    <table class="w-full text-xs text-left text-slate-200">
+                        <thead class="text-[11px] text-slate-300 uppercase bg-slate-800/90 border-b border-slate-700">
+                            <tr>
+                                <th scope="col" class="px-3.5 py-2.5 font-bold">Thành viên (% đóng)</th>
+                                <th scope="col" class="px-3 py-2.5 font-bold text-center">1 Tháng</th>
+                                <th scope="col" class="px-3 py-2.5 font-bold text-center">3 Tháng</th>
+                                <th scope="col" class="px-3 py-2.5 font-bold text-center">6 Tháng</th>
+                                <th scope="col" class="px-3 py-2.5 font-bold text-center text-rose-400">12 Tháng</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 bg-slate-900/60">
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="px-3.5 py-2 font-semibold text-rose-300">Người 1 (100%)</td>
+                                <td class="px-3 py-2 text-center">113.850đ</td>
+                                <td class="px-3 py-2 text-center">341.550đ</td>
+                                <td class="px-3 py-2 text-center">683.100đ</td>
+                                <td class="px-3 py-2 text-center font-bold text-rose-400">1.366.200đ</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="px-3.5 py-2 font-semibold text-amber-300">Người 2 (70%)</td>
+                                <td class="px-3 py-2 text-center">79.695đ</td>
+                                <td class="px-3 py-2 text-center">239.085đ</td>
+                                <td class="px-3 py-2 text-center">478.170đ</td>
+                                <td class="px-3 py-2 text-center font-bold text-amber-400">956.340đ</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="px-3.5 py-2 font-semibold text-emerald-300">Người 3 (60%)</td>
+                                <td class="px-3 py-2 text-center">68.310đ</td>
+                                <td class="px-3 py-2 text-center">204.930đ</td>
+                                <td class="px-3 py-2 text-center">409.860đ</td>
+                                <td class="px-3 py-2 text-center font-bold text-emerald-400">819.720đ</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="px-3.5 py-2 font-semibold text-blue-300">Người 4 (50%)</td>
+                                <td class="px-3 py-2 text-center">56.925đ</td>
+                                <td class="px-3 py-2 text-center">170.775đ</td>
+                                <td class="px-3 py-2 text-center">341.550đ</td>
+                                <td class="px-3 py-2 text-center font-bold text-blue-400">683.100đ</td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/40">
+                                <td class="px-3.5 py-2 font-semibold text-purple-300">Người 5+ (40%)</td>
+                                <td class="px-3 py-2 text-center">45.540đ</td>
+                                <td class="px-3 py-2 text-center">136.620đ</td>
+                                <td class="px-3 py-2 text-center">273.240đ</td>
+                                <td class="px-3 py-2 text-center font-bold text-purple-400">546.480đ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Build dynamic sections HTML
+            const sectionsHTML = sections.map(sec => {
+                const style = getStyleByDisplayType(sec.displayType);
+                const isTableType = sec.displayType === 'table' && isBhyt;
+
+                return `
+                    <div class="p-4 rounded-2xl border ${style.boxClass} space-y-1.5 transition">
+                        <div class="flex items-center gap-2 ${style.titleClass} font-bold text-xs uppercase tracking-wide">
+                            <i class="fa-solid ${style.icon}"></i>
+                            <span>${sec.label || 'Thông tin'}</span>
+                        </div>
+                        ${isTableType ? bhytTableHTML : `<p class="text-slate-300 leading-relaxed whitespace-pre-line text-xs font-medium">${sec.content || ''}</p>`}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="space-y-5 animate-fade-in">
+                    <!-- Detail Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">${catObj.category}</span>
+                                <span class="text-slate-600">•</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-md font-semibold border ${item.badgeColor || 'bg-slate-700 text-slate-300'}">
+                                    ${item.badge || 'Chính sách'}
+                                </span>
+                            </div>
+                            <h2 class="text-lg font-extrabold text-white tracking-tight">${item.title}</h2>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyPolicyText('${item.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-copy text-blue-400"></i>
+                                <span>Sao chép tư vấn</span>
+                            </button>
+                            <button onclick="openEditModal('${item.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-xl border border-slate-700 transition">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Policy Content Dynamic Sections -->
+                    <div class="grid grid-cols-1 gap-4 text-xs">
+                        ${sectionsHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= DYNAMIC POLICY BUILDER (UNCONSTRAINED FIELDS) =================
+        function addDynamicSectionField(label = '', content = '', displayType = 'info') {
+            const container = document.getElementById('dynamicSectionsContainer');
+            const sectionIndex = Date.now() + Math.random().toString(36).substring(2, 5);
+
+            const sectionCard = document.createElement('div');
+            sectionCard.className = "p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3 relative dynamic-section-card";
+            sectionCard.dataset.id = sectionIndex;
+
+            sectionCard.innerHTML = `
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block font-semibold text-slate-400 text-[11px] mb-1">Tên nhãn / Tiêu đề trường</label>
+                            <input type="text" value="${escapeHtml(label)}" placeholder="VD: Thời gian bảo hành, Bảng giá, Điều kiện..."
+                                class="sec-label w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-100 font-semibold text-xs outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-400 text-[11px] mb-1">Kiểu hiển thị</label>
+                            <select class="sec-type w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-slate-100 font-semibold text-xs outline-none focus:border-blue-500">
+                                <option value="info" ${displayType === 'info' ? 'selected' : ''}>Xanh dương (Thông tin chuẩn)</option>
+                                <option value="success" ${displayType === 'success' ? 'selected' : ''}>Xanh lá (Đổi trả / Quyền lợi)</option>
+                                <option value="warning" ${displayType === 'warning' ? 'selected' : ''}>Vàng cam (Lưu ý / Trả chậm)</option>
+                                <option value="alert" ${displayType === 'alert' ? 'selected' : ''}>Đỏ (Cảnh báo quan trọng)</option>
+                                <option value="table" ${displayType === 'table' ? 'selected' : ''}>Tím (Dạng Bảng / Công cụ)</option>
+                                <option value="badge" ${displayType === 'badge' ? 'selected' : ''}>Chàm (Thẻ Highlight)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" onclick="this.closest('.dynamic-section-card').remove()" class="mt-4 p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition" title="Xóa trường này">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-400 text-[11px] mb-1">Nội dung chi tiết</label>
+                    <textarea rows="3" placeholder="Nhập nội dung quy định, điều kiện, ghi chú..."
+                        class="sec-content w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 font-medium text-xs outline-none focus:border-blue-500 custom-scrollbar">${escapeHtml(content)}</textarea>
+                </div>
+            `;
+
+            container.appendChild(sectionCard);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function openEditModal(itemId) {
+            updateCategorySelectOptions();
+            const modal = document.getElementById('editModal');
+            const titleEl = document.getElementById('modalTitle');
+            const container = document.getElementById('dynamicSectionsContainer');
+            const btnDelete = document.getElementById('btnDeletePolicyItem');
+            
+            container.innerHTML = '';
+
+            if (itemId) {
+                titleEl.textContent = "Chỉnh Sửa Chính Sách";
+                btnDelete.classList.remove('hidden');
+
+                let item = null;
+                let categoryName = "";
+                for (let c of categoriesData) {
+                    const found = c.items.find(i => i.id === itemId);
+                    if (found) { item = found; categoryName = c.category; break; }
+                }
+
+                if (item) {
+                    document.getElementById('editItemId').value = item.id;
+                    document.getElementById('editCategory').value = categoryName;
+                    document.getElementById('editTitle').value = item.title;
+                    document.getElementById('editBadge').value = item.badge || '';
+
+                    const sections = getItemSections(item);
+                    sections.forEach(sec => {
+                        addDynamicSectionField(sec.label, sec.content, sec.displayType);
+                    });
+                }
+            } else {
+                titleEl.textContent = "Thêm Chính Sách Mới";
+                btnDelete.classList.add('hidden');
+                document.getElementById('policyForm').reset();
+                document.getElementById('editItemId').value = '';
+
+                // Add 2 default section fields for quick creation
+                addDynamicSectionField("Bảo hành & Điều kiện", "", "info");
+                addDynamicSectionField("Chính sách đổi trả / Phí", "", "success");
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function savePolicy(e) {
+            e.preventDefault();
+            const itemId = document.getElementById('editItemId').value;
+            const categoryName = document.getElementById('editCategory').value;
+            const title = document.getElementById('editTitle').value.trim();
+            const badge = document.getElementById('editBadge').value.trim();
+
+            if (!title) return;
+
+            // Collect dynamic sections
+            const sectionCards = document.querySelectorAll('.dynamic-section-card');
+            const sections = [];
+
+            sectionCards.forEach(card => {
+                const label = card.querySelector('.sec-label').value.trim();
+                const displayType = card.querySelector('.sec-type').value;
+                const content = card.querySelector('.sec-content').value.trim();
+
+                if (label || content) {
+                    sections.push({
+                        label: label || 'Thông tin',
+                        content: content,
+                        displayType: displayType
+                    });
+                }
+            });
+
+            let catObj = categoriesData.find(c => c.category === categoryName);
+            if (!catObj) {
+                catObj = { category: categoryName, icon: "fa-folder", items: [] };
+                categoriesData.push(catObj);
+            }
+
+            if (itemId) {
+                for (let c of categoriesData) {
+                    const idx = c.items.findIndex(i => i.id === itemId);
+                    if (idx !== -1) {
+                        c.items.splice(idx, 1);
+                        break;
+                    }
+                }
+                catObj.items.push({
+                    id: itemId,
+                    title,
+                    badge: badge || 'Chính sách',
+                    badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                    sections
+                });
+                showToast('Cập nhật chính sách thành công!');
+            } else {
+                const newId = 'custom-' + Date.now();
+                catObj.items.push({
+                    id: newId,
+                    title,
+                    badge: badge || 'Mới',
+                    badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                    sections
+                });
+                activeItemId = newId;
+                showToast('Thêm mới chính sách thành công!');
+            }
+
+            saveDataToStorage();
+            closeEditModal();
+            renderCategoryTabs();
+            renderItemList();
+        }
+
+        function deleteCurrentPolicyItem() {
+            const itemId = document.getElementById('editItemId').value;
+            if (!itemId) return;
+
+            if (confirm('Bạn có chắc muốn xóa sản phẩm/chính sách này?')) {
+                for (let c of categoriesData) {
+                    const idx = c.items.findIndex(i => i.id === itemId);
+                    if (idx !== -1) {
+                        c.items.splice(idx, 1);
+                        break;
+                    }
+                }
+                saveDataToStorage();
+                closeEditModal();
+                activeItemId = null;
+                renderCategoryTabs();
+                renderItemList();
+                showToast('Đã xóa sản phẩm thành công!');
+            }
+        }
+
+        function copyPolicyText(itemId) {
+            let item = null;
+            for (let c of categoriesData) {
+                const found = c.items.find(i => i.id === itemId);
+                if (found) { item = found; break; }
+            }
+            if (!item) return;
+
+            const sections = getItemSections(item);
+            let textToCopy = `=== ${item.title.toUpperCase()} ===\n`;
+            if (item.badge) textToCopy += `[${item.badge}]\n\n`;
+
+            sections.forEach(sec => {
+                textToCopy += `[${sec.label.toUpperCase()}]\n${sec.content}\n\n`;
+            });
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy.trim();
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+                showToast('Đã sao chép nội dung tư vấn!');
+            } catch (err) {
+                showToast('Không thể sao chép văn bản');
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        // ================= CALCULATORS =================
+        function calculateFee() {
+            const price = parseFloat(document.getElementById('calcPrice').value) || 0;
+            const month = parseInt(document.getElementById('calcMonth').value) || 1;
+            const isBoxLost = document.getElementById('calcBox').value === 'lost';
+            const resultEl = document.getElementById('calcResult');
+
+            if (price <= 0) {
+                resultEl.innerHTML = `<p class="text-center text-slate-500 py-2">Vui lòng nhập giá sản phẩm để tính toán</p>`;
+                return;
+            }
+
+            let feePct = 20 + (month - 1) * 10;
+            let baseFeeAmount = (price * feePct) / 100;
+
+            resultEl.innerHTML = `
+                <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-700">
+                    <span class="text-slate-400">Mức phí đổi trả (${feePct}%):</span>
+                    <span class="font-bold text-rose-400">-${formatVNPay(baseFeeAmount)}</span>
+                </div>
+                ${isBoxLost ? `
+                    <div class="flex justify-between items-center text-xs py-1 border-b border-slate-700">
+                        <span class="text-amber-400">Phí mất vỏ hộp:</span>
+                        <span class="font-bold text-amber-400">Tính thêm phí theo quy định</span>
+                    </div>
+                ` : ''}
+                <div class="flex justify-between items-center pt-2">
+                    <span class="font-bold text-slate-200">Số tiền hoàn khách nhận:</span>
+                    <span class="text-lg font-extrabold text-emerald-400">${formatVNPay(Math.max(price - baseFeeAmount, 0))}</span>
+                </div>
+            `;
+        }
+
+        function calculateInstallment() {
+            const price = parseFloat(document.getElementById('instPrice').value) || 0;
+            const downPay = parseFloat(document.getElementById('instDownPay').value) || 0;
+            const tenure = parseInt(document.getElementById('instTenure').value) || 1;
+            const rateMonthly = (parseFloat(document.getElementById('instRate').value) || 0) / 100;
+            const feeMonthly = parseFloat(document.getElementById('instFee').value) || 0;
+
+            const resultBox = document.getElementById('instResultBox');
+
+            if (price <= 0) {
+                resultBox.innerHTML = `<p class="text-center text-slate-500 py-2">Nhập giá sản phẩm để tính toán</p>`;
+                return;
+            }
+
+            const loanAmount = Math.max(price - downPay, 0);
+            const monthlyPrincipal = loanAmount / tenure;
+            const monthlyInterest = loanAmount * rateMonthly;
+            const monthlyTotal = monthlyPrincipal + monthlyInterest + feeMonthly;
+
+            resultBox.innerHTML = `
+                <div class="flex justify-between items-center pb-2 border-b border-emerald-800/50">
+                    <span class="text-slate-400">Vốn vay còn lại:</span>
+                    <span class="font-bold text-slate-200">${formatVNPay(loanAmount)}</span>
+                </div>
+                <div class="flex justify-between items-center py-1">
+                    <span class="font-semibold text-emerald-300">Góp mỗi tháng (${tenure} tháng):</span>
+                    <span class="text-base font-extrabold text-emerald-400">${formatVNPay(monthlyTotal)}/tháng</span>
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-emerald-800/50 text-[11px]">
+                    <span class="text-slate-400">Lưu ý hủy hợp đồng:</span>
+                    <span class="font-bold text-amber-300">Miễn phí trước 14 ngày</span>
+                </div>
+            `;
+        }
+
+        function calculateBhytFee() {
+            const count = parseInt(document.getElementById('bhytMemberCount').value) || 1;
+            const duration = parseInt(document.getElementById('bhytDuration').value) || 12;
+            const resultBox = document.getElementById('bhytResultBox');
+
+            const rates1m = [113850, 79695, 68310, 56925, 45540];
+            const percentages = [100, 70, 60, 50, 40];
+
+            let totalAmount = 0;
+            let detailRows = [];
+
+            for (let i = 0; i < count; i++) {
+                const rate = i < 4 ? rates1m[i] : rates1m[4];
+                const pct = i < 4 ? percentages[i] : 40;
+                const memberTotal = rate * duration;
+                totalAmount += memberTotal;
+
+                const personLabel = i < 4 ? `Người thứ ${i + 1}` : `Người thứ ${i + 1} trở đi`;
+                detailRows.push(`
+                    <div class="flex items-center justify-between py-1 border-b border-rose-900/40 last:border-b-0 text-xs">
+                        <span class="font-medium text-slate-300">${personLabel} (${pct}%):</span>
+                        <span class="font-bold text-slate-100">${formatVNPay(memberTotal)}</span>
+                    </div>
+                `);
+            }
+
+            resultBox.innerHTML = `
+                <div class="border-b border-rose-800/60 pb-2 flex items-baseline justify-between">
+                    <div>
+                        <span class="text-[11px] uppercase font-bold text-rose-400 tracking-wider">Tổng phí BHYT (${count} người):</span>
+                        <div class="text-xl font-extrabold text-rose-400 leading-none mt-1">
+                            ${formatVNPay(totalAmount)}
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold bg-rose-900/60 text-rose-300 px-2 py-0.5 rounded-md border border-rose-800">${duration} tháng</span>
+                </div>
+
+                <div class="bg-slate-900/80 p-3 rounded-xl border border-rose-900/40 space-y-1">
+                    <div class="text-[11px] font-bold uppercase text-slate-400 mb-1">Mức đóng chi tiết:</div>
+                    ${detailRows.join('')}
+                </div>
+
+                <div class="text-[11px] text-rose-300/90 bg-rose-950/30 p-2.5 rounded-lg border border-rose-900/40 leading-relaxed">
+                    <i class="fa-solid fa-circle-info mr-1 text-rose-400"></i>
+                    Yêu cầu: CCCD/VNeID, <strong>cùng địa chỉ thường trú</strong> (hoặc giấy tạm trú tại nơi mua).
+                </div>
+            `;
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value;
+            renderItemList();
+        }
+
+        function openCalcModal() { document.getElementById('calcModal').classList.remove('hidden'); calculateFee(); }
+        function closeCalcModal() { document.getElementById('calcModal').classList.add('hidden'); }
+        
+        function openInstallmentModal() { document.getElementById('installmentModal').classList.remove('hidden'); calculateInstallment(); }
+        function closeInstallmentModal() { document.getElementById('installmentModal').classList.add('hidden'); }
+
+        function openBhytModal() { document.getElementById('bhytModal').classList.remove('hidden'); calculateBhytFee(); }
+        function closeBhytModal() { document.getElementById('bhytModal').classList.add('hidden'); }
+
+        function formatVNPay(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        window.onload = function() {
+            loadDataFromStorage();
+            renderCategoryTabs();
+            renderItemList();
+        };
+    </script>
+</body>
+</html>
